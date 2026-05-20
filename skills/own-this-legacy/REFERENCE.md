@@ -31,14 +31,25 @@ Before saying anything to the user, silently read the project.
 - **Risky spots** — error-prone patterns, missing error handling, complex async chains
 - **Configuration** — env vars, build config, deployment-specific behavior
 
-### Build an internal checklist
+### Build internal checklist (by category)
 
-Build a private map of topics that need to be covered in the interview.
-**Don't show this to the user.** It's your guide, not a quiz sheet.
+Organise your findings into these categories. For each item, note its category
+so the interview covers all dimensions — not just data flow.
 
-Prioritize by complexity and risk — trivial things (a button click handler,
-a simple utility function) don't need coverage. Focus on things where
-misunderstanding would cause real bugs or block optimization.
+| Category | What to look for |
+|----------|------------------|
+| **Tech stack** | Runtime (Node, Deno, Python, Go, Rust…), framework (Next, Express, Django, Gin…), language version, build tools (Vite, Turbopack, esbuild…), CSS approach (Tailwind, CSS Modules, vanilla…) |
+| **Packages & dependencies** | Key dependencies from lockfile/package manifest — ORMs, DB drivers, auth libs, HTTP clients, validation libs, utility libs. Note which are central vs peripheral. |
+| **Architecture & patterns** | Folder layout (layered, modular, flat), state management approach, data fetching pattern, component hierarchy, error handling strategy, middleware chain, dependency injection |
+| **Data flow** | How data enters, transforms, and exits the system — API routes → handlers → services → DB, file upload pipelines, event pipelines |
+| **Non-trivial implementations** | WASM, media processing, real-time (WebSockets, SSE), auth/encryption, file system ops, queues/workers, external API integrations |
+| **Configuration & deployment** | Env vars shape, build/deploy configs, environment-specific behaviour, feature flags |
+| **Risky spots** | Missing error handling, complex async chains, circular dependencies, mutable shared state, missing validation |
+
+**Don't show this checklist to the user.** It's your guide, not a quiz sheet.
+
+Prioritize by complexity and risk. Trivial things (a button click handler,
+a simple utility) don't need coverage.
 
 ---
 
@@ -50,23 +61,83 @@ sentences, then dive in. Don't announce the structure or mention the checklist.
 ### Conversation principles
 
 - **Conversational, not formal** — this is a discussion, not an exam.
-- **Adaptive** — if the user explains something well, move on. If they're shaky,
-  slow down, ask follow-ups, probe deeper.
-- **Natural topic transitions** — don't announce "moving on to WASM now". Let
-  topics flow into each other organically. If a topic hasn't come up naturally
+- **Multiple-choice first** — always lead with a,b,c,d for each category.
+- **Adaptive** — (a) → move on fast. (b) → 1-2 targeted follow-ups. (c) → note
+  gap, move on. (d) → engage in discussion, they want to talk about it.
+  Don't drag any category.
+- **Natural topic transitions** — don't announce "moving to tech stack now". Let
+  topics flow into each other organically. If a category hasn't come up naturally
   by the end, bring it up casually.
-- **Mixed question formats:**
-  - Open explanation: *"Walk me through what happens when a user uploads a file"*
-  - Concept check: *"What does WASM actually do here? Explain it in your own words"*
-  - Multiple choice for familiarity: *"How familiar are you with FFmpeg?
-    (a) Used it before and understand it well (b) Used it but don't fully get it
-    (c) First time encountering it"*
-  - Honest probe: *"If this broke at 2am, where would you start looking?"*
-- **Accept honest answers** — if the user says "I have no idea how this works",
-  that's gold. Don't let them off with vague answers but don't pressure them either.
+- **Accept honest answers** — if the user says "no idea" (c), that's gold.
+  Don't pressure them. Move on.
 - **Follow the user's energy** — if they're excited about a topic, let them talk.
   If they're clearly lost on something, note it and move on rather than making them
   feel bad.
+
+### Category-specific questioning (multiple-choice + discuss option)
+
+Lead with a **4-option familiarity question** for every category.
+The 4th option (d) is an escape hatch — if the user picks it, they want to
+discuss rather than just rate themselves. Engage conversationally.
+
+```
+Template for every category:
+
+"How familiar are you with [topic]?
+  (a) Understand it well
+  (b) Used it but don't fully get it
+  (c) First time / no idea
+  (d) Let's discuss this"
+```
+
+**If (a):** Quick confirm ("cool, sounds good"), tag ✅, move to next category.
+**If (b):** Ask 1–2 targeted follow-ups to pinpoint the gap, tag ⚠️.
+**If (c):** Tag ❌, say "no worries, I'll cover it in the docs", move on.
+**If (d):** They want to talk about it. Engage in open discussion — answer
+questions, explain concepts, explore together. Tag based on what emerges.
+
+---
+
+**Example for each category:**
+
+**Tech stack**
+- "This project uses [Next.js / Express / Django / …]. How familiar are you with it?
+  (a) Used it before, know it well  (b) Used it but gaps  (c) First time  (d) Let's discuss"
+- (b) follow-up: "Any part of the setup that's confusing — routing, data fetching, middleware?"
+
+**Packages & dependencies**
+- "The project depends on [Prisma / Zod / Redis / …]. How well do you know it?
+  (a) Know what it does  (b) Heard of it but not sure how it's used here
+  (c) Never heard of it  (d) Tell me about it"
+- (b) follow-up: "Want me to explain how it's wired in?"
+
+**Architecture & patterns**
+- "How's your understanding of the project structure?
+  (a) I know where everything lives  (b) Rough idea but not the details
+  (c) Lost  (d) Let's go through it together"
+- (b) follow-up: "Any specific layer — routes, services, DB layer — that's fuzzy?"
+
+**Data flow**
+- "Do you have a mental model of how data moves through the app?
+  (a) Yes, clear picture  (b) Some parts  (c) Not really  (d) Walk me through it"
+- (b) follow-up: "Which part — API calls, DB queries, state management?"
+
+**Non-trivial implementations**
+- "The [WASM / queue / WebSocket / auth] part. How familiar?
+  (a) Understand it well  (b) Used but don't fully get it
+  (c) No idea  (d) Let's talk about it"
+- (b) follow-up: "Want me to walk through the key parts quickly?"
+
+**Configuration & deployment**
+- "The [env vars / Dockerfile / deploy config]. Clear?
+  (a) Yes  (b) Somewhat  (c) Haven't looked  (d) Explain it to me"
+- (b) follow-up: "Anything specific you want explained?"
+
+**Risky spots**
+- "I spotted [specific pattern in code]. Were you aware of it?
+  (a) Yes, intentional  (b) Saw it but not sure why
+  (c) No, didn't notice  (d) Tell me more"
+- If (b) or (c): Briefly explain the risk.
 
 ### Internal tracking
 

@@ -1,10 +1,4 @@
----
-name: own-this
-description: Help developers take ownership of vibe-coded projects they built with AI but don't fully understand. Use this skill when a user says "own-this", "own this project", "help me understand this codebase", "I vibe-coded this and don't understand it", or "debrief this project". The skill scans the project, interviews the developer conversationally to surface genuine understanding gaps, then generates modular dynamic documentation shaped by the interview. Trigger whenever someone expresses shallow understanding of code they wrote with AI assistance, even if they don't use the exact phrase "own-this".
----
-
 # own-this
-
 **A skill for AI agents to help developers take ownership of vibe-coded projects.**
 
 ---
@@ -15,7 +9,6 @@ Developers who vibe-code with AI often end up with working apps they don't fully
 understand. When bugs hit or optimization is needed, they're helpless without the AI.
 
 This skill guides an agent to:
-
 1. Scan a project and map its critical technologies and implementation points
 2. Interview the developer conversationally to surface genuine understanding gaps
 3. Generate modular, dynamic documentation based on what was found and what was unclear
@@ -28,7 +21,6 @@ docs shaped by their own understanding.
 ## Trigger
 
 User says any of:
-
 - `"own-this"`
 - `"own this project"`
 - `"help me understand this codebase"`
@@ -78,41 +70,23 @@ then dive in. Don't announce the structure or mention the checklist.
 - **Conversational, not formal** — this is a discussion, not an exam
 - **Adaptive** — if the user explains something well, move on. If they're shaky, slow down, ask follow-ups, probe deeper
 - **Natural topic transitions** — don't announce "moving on to WASM now". Let topics flow into each other organically. If a topic hasn't come up naturally by the end, bring it up casually
+- **Mixed question formats:**
+  - Open explanation: *"Walk me through what happens when a user uploads a file"*
+  - Concept check: *"What does WASM actually do here? Explain it in your own words"*
+  - Multiple choice for familiarity: *"How familiar are you with FFmpeg? (a) Used it before and understand it well (b) Used it but don't fully get it (c) First time encountering it"*
+  - Honest probe: *"If this broke at 2am, where would you start looking?"*
 - **Accept honest answers** — if the user says "I have no idea how this works", that's gold. Don't let them off with vague answers but don't pressure them either
-- **Follow the user's energy** — if they're excited about a topic let them talk. If they're clearly lost, note it and move on rather than making them feel bad
-
-**Mixed question rhythm — keep it varied, never monotonous:**
-
-The interview should feel like a conversation with a curious senior developer, not a quiz.
-Deliberately alternate between question types so the user stays engaged and honest.
-
-| Type                 | When to use                                                                | Example                                                                                                                                                         |
-| -------------------- | -------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| **Open explanation** | Opening a new topic, testing depth                                         | _"Walk me through what happens when a user uploads a file"_                                                                                                     |
-| **Multiple choice**  | Gauging familiarity quickly, resetting pace after a heavy topic            | _"How familiar are you with FFmpeg before this project? (a) Used it before and get it well (b) Used it but don't fully understand it (c) First time seeing it"_ |
-| **Concept check**    | After they explain something — verify they know the why, not just the what | _"You mentioned WASM — explain in your own words what it actually does here"_                                                                                   |
-| **Honest probe**     | Surfaces real understanding vs surface confidence                          | _"If this broke at 2am and you had no AI, where would you even start?"_                                                                                         |
-| **Scenario**         | Tests applied understanding, not memorized answers                         | _"If a user uploads a 2GB file and the browser crashes — which part of the code is most likely responsible?"_                                                   |
-| **Fill-in**          | Quick lightweight check, good after 2–3 heavy questions                    | _"The FFmpeg command runs inside \_\_\_ — what's your understanding of what that environment is?"_                                                              |
-
-**Pacing rules:**
-
-- Never ask two open-ended questions in a row — follow a heavy question with a lighter one
-- Use multiple choice to reset after any topic where the user struggled — it relieves pressure and lets them recover
-- Use scenarios sparingly — max 1–2 per interview, only for the most critical paths
-- If the user gives a short or evasive answer, don't immediately follow with another question — reflect it back first: _"So you're saying you're not sure what happens after the encode step — is that right?"_ This gives them a chance to elaborate naturally
-- If energy drops (short answers, "I don't know" repeatedly), switch to multiple choice for a few questions to rebuild momentum before going open again
+- **Follow the user's energy** — if they're excited about a topic let them talk. If they're clearly lost on something, note it and move on rather than making them feel bad
 
 **Track internally as you go:**
-
 - ✅ Understood well
 - ⚠️ Partial — knows the surface but not the depth
 - ❌ Gap — doesn't understand this at all
 - ⏭ Skipped — not covered, needs a page anyway
 
 **End the interview naturally** — when all checklist items are covered (or consciously
-skipped), wrap up warmly. Something like: _"I think I have a good picture of where
-you're at with this. Let me put together the docs."_
+skipped), wrap up warmly. Something like: *"I think I have a good picture of where
+you're at with this. Let me put together the docs."*
 
 ---
 
@@ -143,7 +117,6 @@ Create a page for each critical topic found in the scan, shaped by interview res
 There is no fixed list — the pages emerge from the project and the conversation.
 
 Examples of pages that might exist (project-dependent):
-
 - `wasm.md` — what WASM is, why it's used here, how it's wired in
 - `ffmpeg-pipeline.md` — the processing chain, inputs, outputs, flags used
 - `file-sdk.md` — what the SDK does, how the app uses it, key methods
@@ -164,28 +137,22 @@ All pages use this structure as a base — adapt as needed per topic:
 # <Topic>
 
 ## What this is
-
 One paragraph. Plain language. No assumed knowledge.
 
 ## Why this project uses it
-
 Specific to this codebase — not generic documentation.
 
 ## How it's implemented here
-
 Walk through the actual implementation. Reference real files and line areas.
 Explain the non-obvious parts.
 
 ## What could go wrong
-
 Common failure points, edge cases, things to watch.
 
 ## How to debug this
-
 Where to look first if something breaks here.
 
 ## Go deeper
-
 Concepts and search terms to study if you want to understand this fully.
 (No URLs — search terms age better.)
 ```
@@ -196,7 +163,6 @@ If the user wants output in an Obsidian vault, use `[[wikilinks]]` for all
 internal page references instead of standard markdown links.
 
 At the end of doc generation, ask:
-
 > "Do you have an Obsidian vault? If yes, give me the path and I'll copy
 > the docs there with wikilink formatting."
 
@@ -216,24 +182,21 @@ If they provide a path — copy all files there, convert all internal links to
 > Pages marked ❌ cover areas that were gaps — read these carefully.
 
 ## Project overview
-
 <2–3 sentence description of what the app does and its core technical shape.>
 
 ## Pages
 
-| Page                | What it covers          | Understanding |
-| ------------------- | ----------------------- | ------------- |
-| [[gaps]]            | What to learn next      | —             |
-| [[wasm]]            | WebAssembly integration | ❌            |
-| [[ffmpeg-pipeline]] | Video processing chain  | ⚠️            |
-| [[file-sdk]]        | File SDK usage          | ✅            |
+| Page | What it covers | Understanding |
+|------|---------------|---------------|
+| [[gaps]] | What to learn next | — |
+| [[wasm]] | WebAssembly integration | ❌ |
+| [[ffmpeg-pipeline]] | Video processing chain | ⚠️ |
+| [[file-sdk]] | File SDK usage | ✅ |
 
 ## Critical paths
-
 <List the 2–3 most important flows to understand for debugging this app.>
 
 ## Riskiest spots
-
 <What to watch. Where bugs are most likely to hide.>
 ```
 
@@ -248,21 +211,17 @@ These are areas where your understanding was thin or missing during the intervie
 Prioritized by risk to the project.
 
 ## High priority
-
 <Things that would block you from debugging or optimizing the core of the app.>
 
 ### <Topic>
-
 - What you said: "<honest summary of what the user expressed>"
 - What's actually happening: "<brief honest explanation>"
 - What to study: <search terms, concept names>
 
 ## Medium priority
-
 <Things that are important but won't block you immediately.>
 
 ## Low priority
-
 <Nice to know, but the app will be fine without it.>
 ```
 
@@ -272,6 +231,6 @@ Prioritized by risk to the project.
 
 - **Never make the user feel bad** about gaps — the whole point is they didn't understand it yet
 - **Be honest in the docs** — if something is genuinely complex, say so. Don't sugarcoat risky spots
-- **Write for the user, not for the code** — docs explain _why_ and _what could go wrong_, not just _what_
+- **Write for the user, not for the code** — docs explain *why* and *what could go wrong*, not just *what*
 - **Don't document the obvious** — skip things any developer would know. Focus on what's specific to this stack or implementation
 - **Pages are living docs** — tell the user they can re-run `own-this` after learning more and the docs will be updated to reflect their improved understanding
