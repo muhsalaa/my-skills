@@ -46,6 +46,7 @@ Before saying anything to the user, silently read the project.
 
 - **Entry points** — main files, index, app root, server start
 - **Critical technologies** — frameworks, libraries, SDKs, external services
+- **Every dependency** — read `package.json` (or equivalent). For each dependency listed under `dependencies` and `devDependencies`, note what it does, why it might be used, and whether the developer is likely to know it. This becomes the tech-stack glossary.
 - **Non-trivial implementations** — anything that isn't standard CRUD:
   - Binary/compiled integrations (WASM, native modules)
   - Media processing pipelines (FFmpeg, image manipulation)
@@ -66,6 +67,18 @@ in the interview. Don't show this to the user. It's your guide, not a quiz sheet
 a simple utility function) don't need coverage. Focus on things where misunderstanding
 would cause real bugs or block optimization.
 
+**Build a technology catalog** — for every non-trivial dependency, note:
+- What is this package/library?
+- What problem does it solve?
+- What part of the project uses it? (which files)
+- Would the developer likely know it? (verify in interview)
+
+**Build a file map** — for every source file, note:
+- What is this file's responsibility?
+- What does it import?
+- What imports it?
+This becomes the code-map page.
+
 ---
 
 ## Stage 2 — Interview
@@ -79,6 +92,17 @@ then dive in. Don't announce the structure or mention the checklist.
 - **Adaptive** — if the user explains something well, move on. If they're shaky, slow down, ask follow-ups, probe deeper
 - **Natural topic transitions** — don't announce "moving on to WASM now". Let topics flow into each other organically. If a topic hasn't come up naturally by the end, bring it up casually
 - **Accept honest answers** — if the user says "I have no idea how this works", that's gold. Don't let them off with vague answers but don't pressure them either
+- **Explicitly ask about technology familiarity** — early in the interview ask about
+their comfort with the core stack (language, runtime, major packages). Use a
+multiple-choice / multi-select style question. For example:
+
+  > "How familiar are you with the stack? I see [package A], [package B],
+  > [package C] — which of those have you used before?"
+
+  This is NOT about implementation — it's about whether they even know the tool.
+  Gauge familiarity with: language/runtime, major dependencies (bundler, CLI libs,
+  UI libs, test framework, etc.), build/publish pipeline, domain-specific tech.
+  Track this dimension separately from implementation understanding (see below).
 - **Follow the user's energy** — if they're excited about a topic let them talk. If they're clearly lost, note it and move on rather than making them feel bad
 
 **Mixed question rhythm — keep it varied, never monotonous:**
@@ -103,8 +127,14 @@ Deliberately alternate between question types so the user stays engaged and hone
 - If the user gives a short or evasive answer, don't immediately follow with another question — reflect it back first: _"So you're saying you're not sure what happens after the encode step — is that right?"_ This gives them a chance to elaborate naturally
 - If energy drops (short answers, "I don't know" repeatedly), switch to multiple choice for a few questions to rebuild momentum before going open again
 
-**Track internally as you go:**
+**Track internally as you go — two dimensions:**
 
+**Technology familiarity** (does the dev know the *tool/package* itself?):
+- ✅ Knows this library/framework/tool well
+- ⚠️ Heard of it, used a little, but not confident
+- ❌ Never used it, or first exposure to this kind of thing
+
+**Implementation understanding** (does the dev know how it's *used here*?):
 - ✅ Understood well
 - ⚠️ Partial — knows the surface but not the depth
 - ❌ Gap — doesn't understand this at all
@@ -131,16 +161,23 @@ This analysis determines which pages to create and how deep each one goes.
 
 ## Stage 4 — Doc generation
 
-### Always create these two files:
+### Always create these five files:
 
 **`own-this/MOC.md`** — the central map. Lists and links every page generated.
 **`own-this/gaps.md`** — what the user didn't fully understand, with honest framing
-and pointers on where to go deeper (search terms, concepts to study, not specific URLs).
+and pointers on where to go deeper.
+**`own-this/tech-stack.md`** — the technology catalog. Every non-trivial dependency
+and tool in the project, with a short intro for each (what it is, why used here).
+**`own-this/code-map.md`** — the file map. Every source file listed with its
+responsibility, what it imports, and what imports it. Module dependency diagram.
+**`own-this/architecture.md`** — system architecture. How the pieces fit together,
+key data flows, CLI routing, the high-level shape.
 
 ### Dynamically create topic pages as needed:
 
-Create a page for each critical topic found in the scan, shaped by interview results.
-There is no fixed list — the pages emerge from the project and the conversation.
+Create a page for each critical implementation topic found in the scan, shaped by
+interview results. There is no fixed list — the pages emerge from the project and
+the conversation. Depth is proportional to the gap (see below).
 
 Examples of pages that might exist (project-dependent):
 
@@ -149,16 +186,16 @@ Examples of pages that might exist (project-dependent):
 - `file-sdk.md` — what the SDK does, how the app uses it, key methods
 - `auth-flow.md` — how authentication works end to end
 - `data-flow.md` — how data moves through the system
-- `architecture.md` — the overall structure and why it's shaped that way
+- `install-pipeline.md` — a complex CLI command flow with rollback logic
 - `critical-paths.md` — the most important code paths to understand for debugging
 
 **Page depth is proportional to the gap** — if the user understood WASM well, the
 `wasm.md` page is a concise reference. If they had no idea how it worked, `wasm.md`
 goes deep — explains the concept, explains the implementation, explains what could go wrong.
 
-### Page format
+### Base page format
 
-All pages use this structure as a base — adapt as needed per topic:
+All topic pages use this structure as a base — adapt as needed:
 
 ```markdown
 # <Topic>
@@ -188,6 +225,94 @@ Where to look first if something breaks here.
 
 Concepts and search terms to study if you want to understand this fully.
 (No URLs — search terms age better.)
+```
+
+### Special page: `tech-stack.md`
+
+Intro to every non-trivial dependency and tool. Use this format:
+
+```markdown
+# Technology stack
+
+## <Package name>
+
+<!-- One entry per dependency/tool -->
+
+### What this is
+
+Plain language. What is this thing? What problem does it solve?
+
+### Why this project uses it
+
+What specific job does it do here?
+
+### Where it's used
+
+Key files that rely on this package.
+
+### If you've never used it before
+
+A quick concept primer — enough to follow the code.
+```
+
+Group entries into sections (e.g., "Runtime", "CLI", "Build", "Test").
+For well-known universal concepts (Node.js `fs`, basic TypeScript), skip or
+keep very brief. Focus on what someone new to the ecosystem wouldn't know.
+
+### Special page: `code-map.md`
+
+Every source file, its responsibility, and how they connect:
+
+```markdown
+# Code map
+
+## Entry point
+
+**`<path>`** — what this file does, how it's invoked
+
+Imports from: <list>
+Imported by: <list>
+
+## Commands
+
+**`<path>`** — what this command does, CLI args it handles
+
+Imports from: <list>
+Imported by: <list>
+
+## Core modules
+
+**`<path>`** — responsibility
+
+Imports from: <list>
+Imported by: <list>
+
+## Utilities
+
+**`<path>`** — responsibility
+
+Imports from: <list>
+Imported by: <list>
+
+---
+
+### Module dependency diagram
+
+<ASCII or indented tree showing how modules depend on each other>
+```
+
+Each file gets one entry. Group by directory. The dependency diagram can be
+an indented tree like:
+
+```
+cli.ts
+ ├── commands/install.ts
+ │    ├── core/config.ts
+ │    ├── core/master.ts
+ │    └── core/symlink.ts
+ ├── commands/list.ts
+ │    └── core/tracking.ts
+ └── core/fs-utils.ts
 ```
 
 ### Wikilink format (Obsidian)
@@ -221,12 +346,15 @@ If they provide a path — copy all files there, convert all internal links to
 
 ## Pages
 
-| Page                | What it covers          | Understanding |
-| ------------------- | ----------------------- | ------------- |
-| [[gaps]]            | What to learn next      | —             |
-| [[wasm]]            | WebAssembly integration | ❌            |
-| [[ffmpeg-pipeline]] | Video processing chain  | ⚠️            |
-| [[file-sdk]]        | File SDK usage          | ✅            |
+| Page                | What it covers                 | Understanding |
+| ------------------- | ------------------------------ | ------------- |
+| [[gaps]]            | What to learn next             | —             |
+| [[tech-stack]]      | Technology & package glossary  | —             |
+| [[code-map]]        | File layout & module deps      | —             |
+| [[architecture]]    | System architecture & flow     | —             |
+| [[wasm]]            | WebAssembly integration        | ❌            |
+| [[ffmpeg-pipeline]] | Video processing chain         | ⚠️            |
+| [[file-sdk]]        | File SDK usage                 | ✅            |
 
 ## Critical paths
 
@@ -235,6 +363,17 @@ If they provide a path — copy all files there, convert all internal links to
 ## Riskiest spots
 
 <What to watch. Where bugs are most likely to hide.>
+
+## Technology familiarity
+
+| Package | Familiarity | Doc page |
+| ------- | ----------- | -------- |
+| commander | ⚠️ Partial | [[tech-stack]] |
+| @clack/prompts | ❌ New | [[tech-stack]] |
+```
+
+(The technology familiarity table tracks what the developer didn't know well,
+so they can quickly see which tech-stack entries to read first.)
 ```
 
 ---
@@ -245,23 +384,40 @@ If they provide a path — copy all files there, convert all internal links to
 # Gaps — what to learn next
 
 These are areas where your understanding was thin or missing during the interview.
+Two categories: **technology familiarity** (tools/packages you haven't used before)
+and **implementation understanding** (how things actually work in this codebase).
+
+## Technology familiarity gaps
+
+<Tools, libraries, or concepts the developer hasn't used before or is shaky on.
+Pages in [[tech-stack]] cover these with plain-language intros.>
+
+### <Tool/package name>
+
+- Familiarity level: never used / heard of it / used a little
+- What it is: <one-line explanation>
+- Why this project needs it: <what job it does>
+- Where to start: <which section of tech-stack.md to read first>
+
+## Implementation understanding gaps
+
 Prioritized by risk to the project.
 
-## High priority
+### High priority
 
 <Things that would block you from debugging or optimizing the core of the app.>
 
-### <Topic>
+#### <Topic>
 
 - What you said: "<honest summary of what the user expressed>"
 - What's actually happening: "<brief honest explanation>"
-- What to study: <search terms, concept names>
+- What to study: <search terms, concept names, which doc page covers this>
 
-## Medium priority
+### Medium priority
 
 <Things that are important but won't block you immediately.>
 
-## Low priority
+### Low priority
 
 <Nice to know, but the app will be fine without it.>
 ```
@@ -275,3 +431,7 @@ Prioritized by risk to the project.
 - **Write for the user, not for the code** — docs explain _why_ and _what could go wrong_, not just _what_
 - **Don't document the obvious** — skip things any developer would know. Focus on what's specific to this stack or implementation
 - **Pages are living docs** — tell the user they can re-run `own-this` after learning more and the docs will be updated to reflect their improved understanding
+- **Introduce unfamiliar technology** — if a package or tool is new to the user,
+  its doc page should include a plain-language "what is this" section. Don't assume
+  they know what `@clack/prompts` or `commander` or `rolldown` is. A few sentences
+  explaining the concept goes a long way.
