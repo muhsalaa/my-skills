@@ -1,17 +1,18 @@
 ---
-name: grok-this
-description: "Help a developer understand an unfamiliar codebase well enough to contribute fast. Trigger when user says grok-this, grok this, help me understand this repo, I want to contribute to this, walk me through this codebase, I inherited this code, or anything expressing they are new to a codebase and want to get up to speed. Topic-filtered mode: grok-this auth, websockets scopes the session to those areas only."
+name: own-this
+description: "Help a developer understand an unfamiliar codebase well enough to contribute fast. Trigger when user says own-this, own this, help me understand this repo, I want to contribute to this, walk me through this codebase, I inherited this code, or anything expressing they are new to a codebase and want to get up to speed. Topic-filtered mode: own-this auth, websockets scopes the session to those areas only."
 ---
 
-# grok-this
+# own-this
 
 Get a developer from zero to confident contributor on an unfamiliar codebase.
 
 **Flow:**
 
 1. Scan the project silently
-2. Interview the developer — one question at a time, relentlessly, with your own recommended answer — until you genuinely understand what they know and don't know
-3. Generate one `.md` per topic they need, shaped entirely by the interview
+2. Interview the developer — one question at a time, relentlessly — until you genuinely understand what they know and don't know
+3. Recap — show what you found (confident, gaps, trivial, not-asked). Let the developer correct or drill deeper before generating
+4. Generate one `.md` per topic they need, shaped entirely by the interview
 
 The docs exist to fill their gaps. If they know it, no file. If they don't, a file that teaches it — scoped to how this project uses it.
 
@@ -19,13 +20,13 @@ The docs exist to fill their gaps. If they know it, no file. If they don't, a fi
 
 ## Trigger
 
-- `grok-this` / `grok this`
+- `own-this` / `own this`
 - `help me understand this codebase / repo`
 - `I want to contribute to this`
 - `walk me through this project`
 - `I inherited this code`
 
-**Topic mode:** `grok-this <topic, topic>` — scopes everything to those topics only.
+**Topic mode:** `own-this <topic, topic>` — scopes everything to those topics only.
 
 Run from the project root.
 
@@ -104,13 +105,41 @@ Then go straight into the first real question.
 
 ### Closing
 
-When the full question tree is walked and you have a clear picture of their gaps, close naturally:
+When the full question tree is walked and you have a clear picture of their gaps, close the interview and present the recap.
 
-> "OK — I think I know what you need. Let me generate the docs."
+---
 
-Then ask one final question:
+## Recap — between interview and docs
 
-> "Do you want these formatted for Obsidian? If yes, drop your vault path."
+Before generating, show the developer what you found. This is their chance to correct misjudgments or request deeper coverage.
+
+**Format:**
+
+```
+── Confident (no docs) ──
+  ✓  <topic>                     <why you're skipping it>
+
+── Gaps (docs queued) ──
+  ◆  <topic>                     <why it's a gap>
+  ◐  <topic>                     partial / shaky
+
+── Trivial (skipped) ──
+  1. <pkg>                       <why trivial>
+
+── Not asked (skipped) ──
+  5. <topic>                     <what wasn't covered>
+```
+
+- **✓** = they knew it. No doc.
+- **◆** = clear gap. Doc queued.
+- **◐** = partial understanding. Doc queued unless they say otherwise.
+- Number trivial/not-asked so the developer can type a number to drill deeper.
+
+**Follow with one question:**
+
+> "Anything wrong above, or topics I should add? Type a topic name to drill deeper, or a number (e.g. 'ask 5') to interview on that. Otherwise I'll generate the docs. Obsidian? Drop your vault path."
+
+If they correct a gap ("actually I know commander") → remove it from the doc queue. If they ask to drill on a number → go back to interview mode for that topic. Loop until they're satisfied, then generate.
 
 ---
 
@@ -249,7 +278,7 @@ Search terms (not URLs) to understand this more fully.
 
 If the user wants Obsidian:
 
-- Write all files to their vault path under `grok-this/<project-name>/`
+- Write all files to their vault path under `own-this/<project-name>/`
 - Use `[[wikilinks]]` for all internal links
 - No special characters in filenames
 
