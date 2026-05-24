@@ -1,5 +1,4 @@
 ---
-name: weekly-summary
 description: Create a weekly summary from Obsidian daily notes (Monday–Sunday). Summarizes job hunt progress, learning, key wins, recurring mistakes, and improvement suggestions. Use when user asks for "weekly summary", "week summary", "ringkasan mingguan", or wants to reflect on the past week. Also triggers when user says "what did I do this week" or "summarize my week."
 ---
 
@@ -52,11 +51,11 @@ ls calendar/daily-notes/ | grep -E "^($MON|$TUE|$WED|$THU|$FRI|$SAT|$SUN)\.md$"
 
 Read each daily note. Focus on these three sections:
 
-| Section | What's in it |
-|---|---|
+| Section       | What's in it                                                                                                                                                                                                 |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
 | `## 🦮 Todos` | Daily schedule with checkboxes: shadowing, grammar practice, episoden, SD2 (FE/BE interview prep), Leetcode, free learn, company applications. Also sub-items like `### Monday & Friday` for periodic tasks. |
-| `## ☑️ Notes` | Freeform notes, reflections, deep dives, code reviews, system design breakdowns. |
-| `## 💡 TIL` | Quick bullet points — things learned that day. |
+| `## ☑️ Notes` | Freeform notes, reflections, deep dives, code reviews, system design breakdowns.                                                                                                                             |
+| `## 💡 TIL`   | Quick bullet points — things learned that day.                                                                                                                                                               |
 
 Also find notes created during the week:
 
@@ -97,6 +96,7 @@ Week period, main focus/theme, 1 or 2 additional overview points you think neces
 ## 💼 Job Hunt Progress
 
 Summary of job-finding activities from the week. Pull from:
+
 - `## 🦮 Todos` checkbox completion patterns — which blocks were consistently checked vs. skipped
 - English practice: shadowing (speaking), grammar practice, episoden (conversation) — note completion rate
 - DSA / System Design: Leetcode and SD2 blocks — completion and any content in Notes or TIL about these topics
@@ -119,6 +119,7 @@ What actually clicked this week — the most meaningful takeaways. Pull from TIL
 ## ⚠️ Recurring Mistakes & Weak Spots
 
 Be honest. Look across the week for patterns:
+
 - Consistently unchecked Todos blocks — what's being avoided?
 - If Notes or TIL show the same concept being revisited without progress, call it out
 - Any self-critical reflections in Notes
@@ -129,6 +130,7 @@ Group by topic if there are multiple patterns. Don't sugarcoat — be specific.
 ## 💡 Honest Improvement Suggestions
 
 Based on what was learned and the mistakes above, give direct, actionable suggestions:
+
 - A different approach or method if the current one seems inefficient
 - Specific topics or gaps to prioritize next week
 - Habits or practice patterns worth adjusting
@@ -159,6 +161,6 @@ Once the summary file is created (and any `###` extractions are done), stop. Do 
 
 - Daily notes: `calendar/daily-notes/YYYY-MM-DD.md`
 - Weekly summaries: `calendar/weekly-summary/weekly-summary-{N}-{year}.md`
-- Created notes: `+/`, `atlas/`, `efforts/`
+- Created notes: in existing folders.
 - Daily note frontmatter is YAML between `---` markers — skip it when reading content
 - The `## 🦮 Todos` schedule blocks are: shadowing, grammar practices, episoden, SD2 (FE+BE interview prep), Leetcode, free learn, company applications, Familya, Day Recap, and occasionally `### Monday & Friday` for Quran study

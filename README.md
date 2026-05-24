@@ -13,3 +13,4 @@ A collection of my agent skills for I used for managing projects.
 | **add-agent-docs** | Add a single new doc to an existing `docs/agent/`. Runs a grill-me interview, generates the file with frontmatter, and appends links to the hub README and `AGENTS.md`. |
 | **update-agent-docs** | Refresh existing `docs/agent/` files against code changes since each doc's `last_updated`. Committed-only diff, surgical edits, and flags undocumented areas. |
 | **validate-docs** | Fact-check documentation against the codebase. Extracts technical claims (paths, packages, commands, routes, env vars) and verifies them via filesystem, manifest lookup, or grep. Read-only — terminal report only. |
+| **own-this** | Help a developer understand an unfamiliar codebase well enough to contribute fast. Topic-filtered mode supported. Use when saying "own-this", "help me understand this repo", "I inherited this code", or anything expressing unfamiliarity with a codebase. |
