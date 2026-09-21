@@ -30,15 +30,22 @@ Accept `--deep` flag. Default checks skip function signatures, type shapes, and 
 
 Walk every `*.md` under the target path. For each file, scan line-by-line. Capture `(file, line, claim_type, subject)`. Regex patterns:
 
-| Claim type | Pattern | Notes |
-|------------|---------|-------|
-| Path | `` `([^`]*\/[^`]+\.[a-z0-9]+)` `` | Backticked, contains `/`, has extension |
-| Env var | `` `([A-Z][A-Z0-9_]{2,})` `` | All-caps snake; ≥3 chars; only count when heading/surrounding text mentions `env`, `environment`, `.env` |
-| Package | `` `([@a-z][@a-z0-9-/.]{1,})` `` | Backticked lowercase token; cross-checked against manifest deps |
-| Command | `\b(npm\|pnpm\|yarn\|bun\|cargo\|make\|just\|task\|go)\s+([a-z][a-z0-9:-]*)` | The second capture is the script/target name |
-| Route | `\b(GET\|POST\|PUT\|PATCH\|DELETE)\s+(\/[a-zA-Z0-9:/_\-{}.]*)` | HTTP verb + path |
-| Enum value | Backticked identifier within 2 lines of `enum`, `status`, `role`, `values`, `one of` | |
-| Table/column | Backticked identifier within 2 lines of `table`, `column`, `field`, `schema` | |
+| Claim type   | Pattern                                                                              | Notes                                                                                                                                                             |
+| ------------ | ------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Path         | `` `([^`]*\/[^`]+\.[a-z0-9]+)` ``                                                    | Backticked, contains `/`, has extension. **Reject** URLs (`scheme://`), placeholders and globs (`*`, `<`, `{`, `NNNN`, `...`), and anything containing whitespace |
+| Env var      | `` `([A-Z][A-Z0-9_]{2,})` ``                                                         | All-caps snake; ≥3 chars; only count when heading/surrounding text mentions `env`, `environment`, `.env`                                                          |
+| Package      | `` `([@a-z][@a-z0-9-/.]{1,})` ``                                                     | Low signal — see 3b. Require `@scope/name` or a hyphen, never a token ending in a code extension, never something already caught as a path                        |
+| Command      | `\b(npm\|pnpm\|yarn\|bun\|cargo\|make\|just\|task\|go)\s+([^\s`]+)(?:\s+([^\s`]+))?` | Skip modifier subcommands (`run`, `x`, `dlx`, `exec`, `create`, `add`, `install`, `pm`, `ci`) and take the next token; skip `--flags` and absolute paths          |
+| Route        | `\b(GET\|POST\|PUT\|PATCH\|DELETE)\s+(\/[a-zA-Z0-9:/_\-{}.]*)`                       | HTTP verb + path                                                                                                                                                  |
+| Enum value   | Backticked identifier within 2 lines of `enum`, `status`, `role`, `values`, `one of` |                                                                                                                                                                   |
+| Table/column | Backticked identifier within 2 lines of `table`, `column`, `field`, `schema`         |                                                                                                                                                                   |
+
+**Tuned rules — apply these or the report drowns in false positives.** Learned from a real run over `docs/agent/`, where ~280 of 286 findings were the validator's own fault:
+
+- A path beats a package. Backticked `src/container.ts` contains `/` and reads as a "package"; the path pattern wins, and a package claim must never match a token ending in a code extension (`.ts`, `.tsx`, `.js`, `.json`, `.sql`, `.sh`, `.yml`, `.md`).
+- A command's target may be a file, not a script name: `bun run scripts/reset-db.ts` is verified with `test -e`, not against `package.json` scripts.
+- Prose looks like a command (`make commands`, `bun install`) — skip tokens that are not script names in any manifest.
+- Keep the target doc folder out of grep evidence, but include other markdown folders: cross-doc mentions are evidence.
 
 Prose that matches none of these yields zero claims. Features, design-decisions, glossary, contributing, getting-started pages are scanned the same way; they naturally return few or no claims.
 
@@ -56,6 +63,8 @@ Three primitives, no framework-specific parsers.
 
 `test -e <claim>` relative to repo root. Present if the file or directory exists.
 
+Docs often quote a path relative to `src/` or to the feature folder. Before reporting a miss, retry with a `src/` prefix and then as a suffix match against every file in the repo. Only report when all three attempts fail.
+
 ### 3b. Manifest parse (packages, commands, env vars)
 
 Read once per run, cache in memory.
@@ -66,17 +75,20 @@ Read once per run, cache in memory.
 
 Claim present if the name is a key in the relevant manifest.
 
+**Package claims are the weakest signal — skip them by default.** The same token shape covers filenames (`magic-link.ts`), container names (`familya-postgres-dev`), Docker images (`oven/bun`), GitHub Actions (`oven-sh/setup-bun@v2`), subpath imports (`hono/jsx`) and git hook names (`pre-commit`). Report a package only when the line also mentions install/package/dependency and the token resolves nowhere in the codebase.
+
 ### 3c. Literal grep (routes, enums, tables, columns, plus `--deep` types)
 
 Use ripgrep via the Grep tool. Search the exact subject as a literal string.
 
 Exclude paths:
+
 - `node_modules/`, `.git/`, `dist/`, `build/`, `.next/`, `.nuxt/`, `.turbo/`, `target/`, `.vitepress/cache/`, `.vitepress/dist/`
 - **The target doc folder itself** (prevents the doc from citing itself as evidence)
 
 Include everything else, including other markdown folders — cross-doc mentions count as evidence.
 
-Claim present if ≥1 match found.
+Claim present if ≥1 match found. Before reporting env vars, enum values, table names and column names, retry the search case-insensitively (`PG_CLIENT_KEY` vs `pg_client_key`, `SUBSCRIPTION_STATUS.ACTIVE` vs the enum's own spelling) and report only when both attempts fail.
 
 ## Phase 4: Report
 
@@ -96,6 +108,7 @@ Validated: <target-path> — <N> files, <M> claims checked, <K> missing.
 ```
 
 Reason strings:
+
 - Paths: `file does not exist`
 - Packages: `not in <manifest-file> deps`
 - Commands: `not in <manifest-file> scripts` (or `Makefile`, `justfile`, etc.)

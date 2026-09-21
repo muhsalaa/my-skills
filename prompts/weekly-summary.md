@@ -1,10 +1,10 @@
 ---
-description: Create a weekly summary from Obsidian daily notes (Monday–Sunday). Summarizes job hunt progress, learning, key wins, recurring mistakes, and improvement suggestions. Use when user asks for "weekly summary", "week summary", "ringkasan mingguan", or wants to reflect on the past week. Also triggers when user says "what did I do this week" or "summarize my week."
+description: Create a weekly summary from Obsidian daily notes (Monday–Sunday). Summarizes learning, key wins, recurring mistakes, and improvement suggestions. Use when user asks for "weekly summary", "week summary", "ringkasan mingguan", or wants to reflect on the past week. Also triggers when user says "what did I do this week" or "summarize my week."
 ---
 
 # Weekly Summary Generator
 
-Creates a structured weekly summary from daily notes in this Obsidian vault. Pulls from daily notes (`calendar/daily-notes/`) and any notes created that week (`+/`, `atlas/`, `efforts/`).
+Creates a structured weekly summary from daily notes in this Obsidian vault. Pulls from daily notes (`calendar/daily-notes/`) and any notes created that week.
 
 ## Workflow
 
@@ -51,32 +51,14 @@ ls calendar/daily-notes/ | grep -E "^($MON|$TUE|$WED|$THU|$FRI|$SAT|$SUN)\.md$"
 
 Read each daily note. Focus on these three sections:
 
-| Section       | What's in it                                                                                                                                                                                                 |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| `## 🦮 Todos` | Daily schedule with checkboxes: shadowing, grammar practice, episoden, SD2 (FE/BE interview prep), Leetcode, free learn, company applications. Also sub-items like `### Monday & Friday` for periodic tasks. |
-| `## ☑️ Notes` | Freeform notes, reflections, deep dives, code reviews, system design breakdowns.                                                                                                                             |
-| `## 💡 TIL`   | Quick bullet points — things learned that day.                                                                                                                                                               |
+| Section       | What's in it                                                                     |
+| ------------- | -------------------------------------------------------------------------------- |
+| `## ☑️ Notes` | Freeform notes, reflections, deep dives, code reviews, system design breakdowns. |
+| `## 💡 TIL`   | Quick bullet points — things learned that day.                                   |
 
-Also find notes created during the week:
+Also find notes created during the week, to grasp what worked on.
 
-```bash
-find +/ atlas/ efforts/ -name "*.md" -newermt "$MONDAY" ! -newermt "$NEXT_MONDAY" 2>/dev/null
-```
-
-### Step 3 — Handle `###` Extraction from Notes and TIL
-
-For each daily note, scan `## ☑️ Notes` and `## 💡 TIL` for `### ` headings (level-3). **Do not extract from `## 🦮 Todos`** — those sub-headings are part of the schedule template.
-
-If you find an `### ` heading with substantial content (more than 2 lines):
-
-1. Create a new note file in `+/` using the heading text as filename (e.g., `### Hardest problem distributed consensus and Raft` → `+/Hardest problem distributed consensus and Raft.md`).
-2. Move the heading and its content into the new file. At the bottom, add `## Related\n- [[daily-note-filename]]` linking back to the source daily note.
-3. In the daily note, replace the `### ` block with a wikilink: `- [[New Note Name]]` and a one-line summary.
-4. Skip trivial `###` sections (2 lines or fewer).
-
-**Before creating any extracted notes, tell the user which notes you plan to extract and ask for confirmation.**
-
-### Step 4 — Generate the Weekly Summary
+### Step 3 — Generate the Weekly Summary
 
 Create the file at `calendar/weekly-summary/weekly-summary-{N}-{year}.md`.
 
@@ -93,24 +75,12 @@ Use this exact structure:
 
 Week period, main focus/theme, 1 or 2 additional overview points you think necessary.
 
-## 💼 Job Hunt Progress
-
-Summary of job-finding activities from the week. Pull from:
-
-- `## 🦮 Todos` checkbox completion patterns — which blocks were consistently checked vs. skipped
-- English practice: shadowing (speaking), grammar practice, episoden (conversation) — note completion rate
-- DSA / System Design: Leetcode and SD2 blocks — completion and any content in Notes or TIL about these topics
-- Company applications: "currates 3 companies & apply" block
-- Any self-reflections in `## ☑️ Notes` about interview skills, speaking confidence, or technical prep
-- Notable milestones or struggles in the job hunt
-
 ## 📚 Learning & Development
 
 Things learned this week — from `## 💡 TIL`, `## ☑️ Notes`, and any notes created.
 
 - Add comments or elaboration to TIL points — clarify if something is wrong, add context.
 - Include notes created this week with wikilinks and short summaries.
-- Group related learnings where it makes sense (e.g., all English grammar points together, all distributed systems concepts together).
 
 ## 🏆 Key Wins This Week
 
@@ -122,7 +92,7 @@ Be honest. Look across the week for patterns:
 
 - Consistently unchecked Todos blocks — what's being avoided?
 - If Notes or TIL show the same concept being revisited without progress, call it out
-- Any self-critical reflections in Notes
+- Any self-critical reflections in Notes or Moments.
 - Misunderstandings visible in TIL entries (e.g., a concept described incorrectly)
 
 Group by topic if there are multiple patterns. Don't sugarcoat — be specific.
@@ -141,7 +111,6 @@ Be direct. "You're avoiding X" is better than vague encouragement.
 ## 🔏 Notes Created
 
 - List of notes created this week, with a brief summary for each.
-- If you extracted any `###` sections into new notes in Step 3, list them here with wikilinks and descriptions.
 ```
 
 ### Content Guidelines
@@ -163,4 +132,3 @@ Once the summary file is created (and any `###` extractions are done), stop. Do 
 - Weekly summaries: `calendar/weekly-summary/weekly-summary-{N}-{year}.md`
 - Created notes: in existing folders.
 - Daily note frontmatter is YAML between `---` markers — skip it when reading content
-- The `## 🦮 Todos` schedule blocks are: shadowing, grammar practices, episoden, SD2 (FE+BE interview prep), Leetcode, free learn, company applications, Familya, Day Recap, and occasionally `### Monday & Friday` for Quran study
