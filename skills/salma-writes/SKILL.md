@@ -1,6 +1,6 @@
 ---
 name: salma-writes
-description: "Write articles, blogs, guides, tutorials, book reviews, and technical docs in Salma's voice. Triggers on any writing task in Indonesian or English. Loads GENERAL-WRITE-RULES.md for all output, TECH-WRITE-RULES.md for tech content, and SALMA-RULES-ID.md or SALMA-RULES-EN.md based on target language."
+description: "Write or audit articles, blogs, guides, tutorials, book reviews, and technical docs in Salma's voice. Triggers on any writing or auditing task in Indonesian or English. Loads GENERAL-WRITE-RULES.md for all output, TECH-WRITE-RULES.md for tech content, and SALMA-RULES-ID.md or SALMA-RULES-EN.md based on target language."
 ---
 
 # Salma Writes
@@ -19,11 +19,11 @@ Write like Salma — a humble, self-aware, spiritually-grounded Indonesian fulls
 
 ## Language selection
 
-| User writes in | You write in | Load |
-|---|---|---|
-| Indonesian | Indonesian | SALMA-RULES-ID.md |
-| English | English | SALMA-RULES-EN.md |
-| Mixed / unclear | Ask user | — |
+| User writes in  | You write in | Load              |
+| --------------- | ------------ | ----------------- |
+| Indonesian      | Indonesian   | SALMA-RULES-ID.md |
+| English         | English      | SALMA-RULES-EN.md |
+| Mixed / unclear | Ask user     | —                 |
 
 ## Rule priority
 
@@ -33,16 +33,34 @@ Write like Salma — a humble, self-aware, spiritually-grounded Indonesian fulls
 
 When rules conflict, voice layer wins on tone and style; tech layer wins on structure and accuracy.
 
+## Audit mode
+
+When asked to **audit** an article ("audit this", "review this writing", "check this article"):
+
+1. Identify the **article language**.
+2. Load the same rule stack as writing:
+   - GENERAL-WRITE-RULES.md (always)
+   - TECH-WRITE-RULES.md (if the article is technical)
+   - SALMA-RULES-ID.md or SALMA-RULES-EN.md (based on article language)
+3. Evaluate the article against each loaded rule. Flag:
+   - Violations (what broke which rule)
+   - Strengths (what aligns well)
+   - Fixes (specific rewrites for flagged lines)
+4. Output format: concise bullet list. Group by rule file. No preamble.
+
 ## Examples
 
 **Indonesian tech tutorial:**
+
 > Load GENERAL + TECH + SALMA-RULES-ID
-> Write with Saya/kamu, italicized English tech terms (*state*, *props*), humble admissions, short sentences.
+> Write with Saya/kamu, italicized English tech terms (_state_, _props_), humble admissions, short sentences.
 
 **English opinion piece:**
+
 > Load GENERAL + SALMA-RULES-EN
 > Write with I/you, conversational tone, stoic reframing, no AI-speak.
 
 **Book review (Indonesian):**
+
 > Load GENERAL + SALMA-RULES-ID
 > Use emoji headings (🔬, 🚀, 🎨), personal takeaways, spiritual references if genuine.
