@@ -62,7 +62,7 @@
       "computedHash": "b2888e4f4e8c0af3bfd557575a64b905c44e6248c3101d72077816882b3a92b9"
     },
     "contemplate": {
-      "source": "local",
+      "source": "./local",
       "sourceType": "local",
       "skillPath": "skills/contemplate/SKILL.md",
       "computedHash": ""
@@ -252,6 +252,12 @@
       "sourceType": "github",
       "skillPath": "skills/engineering/retro/SKILL.md",
       "computedHash": "b8d55851a2909e26c2dbb2e8563719c87b3b700559f604e4df344f8c27e21047"
+    },
+    "security-audit": {
+      "source": "cloudflare/security-audit-skill",
+      "sourceType": "github",
+      "skillPath": "skills/security-audit/SKILL.md",
+      "computedHash": "98b97aad2873b3b9a8e064007c25e7827b493ba27fda8bfbdb41dab586767973"
     },
     "setup-matt-pocock-skills": {
       "source": "mattpocock/skills",
